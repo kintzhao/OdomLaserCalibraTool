@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0"?>
 <package>
-  <name>laser-odom_calibration</name>
+  <name>LaserOdomCalibration</name>
   <version>0.1.0</version>
   <description>The laser-odom_calibration package</description>
 
@@ -62,7 +62,8 @@
   <run_depend>geometry_msgs</run_depend>
   <run_depend>rosbag</run_depend>
 
-
+  <build_depend>message_generation</build_depend>
+  <run_depend>message_runtime</run_depend>
   <!-- The export tag contains other, unspecified, tags -->
   <export>
     <!-- Other tools can request additional information be placed here -->

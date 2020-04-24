@@ -10,6 +10,7 @@ cSolver::cSolver()
 
 void cSolver::calib(std::vector<cSynchronizer::sync_data> &calib_data, int outliers_iterations)
 {
+  std::cout<<"=====>>> calib size: "<< calib_data.size()<<std::endl;
   std::vector<cSynchronizer::sync_data> calib_history[outliers_iterations + 1];
   calib_result res;
 
@@ -88,6 +89,7 @@ void cSolver::calib(std::vector<cSynchronizer::sync_data> &calib_data, int outli
     calib_data = n;
   }
 
+  std::cout<<"=====>>> Inlier size: "<< calib_data.size()<<std::endl;
   double laser_std_x, laser_std_y, laser_std_th;
   int estimate_with = 1;
   estimate_noise(calib_history[estimate_with], res, laser_std_x, laser_std_y, laser_std_th);
@@ -156,11 +158,11 @@ bool cSolver::solve(const std::vector<cSynchronizer::sync_data> &calib_data,
   // Verify that A isn't singular
   Eigen::JacobiSVD<Eigen::MatrixXd> svd(A);
   double cond = svd.singularValues()(0) / svd.singularValues()(svd.singularValues().size() - 1);
-  if (cond > max_cond_number)
-  {
-    std::cout << colouredString("Matrix A is almost singular.", RED, BOLD) << std::endl;
-    return 0;
-  }
+  // if (cond > max_cond_number)
+  // {
+  //   std::cout << colouredString("Matrix A is almost singular.", RED, BOLD) << std::endl;
+  //   return 0;
+  // }
 
   // Ay = g --> y = inv(A)g; A square matrix;
   Eigen::Vector2d y = Eigen::Vector2d::Zero();
@@ -265,10 +267,10 @@ Eigen::VectorXd cSolver::full_calibration_min(const Eigen::MatrixXd &M)
   double a, b, c;
 
   a = m11 * pow(m22,2) - m22 * pow(m13,2);
-  b = 2 * m13 * m22 * m35 * m15 - pow(m22,2) * pow(m15,2) - 2 * m11 * m22 * pow(m35, 2)
+  b = 2 * m13 * m22 * m35 * m15 - pow(m22,2) * pow(m15,2)
       + 2 * m13 * m22 * m34 * m14 - 2 * m22 * pow(m13,2) * m44 - pow(m22,2) * pow(m14,2)
       + 2 * m11 * pow(m22,2) * m44 + pow(m13,2) * pow(m35,2) - 2 * m11 * m22 * pow(m34,2)
-      + pow(m13,2) * pow(m34,2);
+      + pow(m13,2) * pow(m34,2) - 2 * m11 * m22 * pow(m35, 2);
   c = -2 * m13 * pow(m35, 3) * m15 - m22 * pow(m13,2) * pow(m44,2) + m11 * pow(m22,2) * pow(m44,2)
       + pow(m13,2) * pow(m35,2) * m44 + 2 * m13 * m22 * m34 * m14 * m44
       + pow(m13,2) * pow(m34,2) * m44 - 2 * m11 * m22 * pow(m34,2) * m44
@@ -279,6 +281,16 @@ Eigen::VectorXd cSolver::full_calibration_min(const Eigen::MatrixXd &M)
       + m22 * pow(m35,2) * pow(m15,2) + m11 * pow(m35,4)
       - pow(m22,2) * pow(m14,2) * m44 + 2 * m13 * m22 * m35 * m15 * m44
       + m22 * pow(m34,2) * pow(m14,2) - pow(m22,2) * pow(m15,2) * m44;
+
+  c = -2 * m13 * pow(m35, 3) * m15 - m22 * pow(m13,2) * pow(m44,2) + pow(m13,2) * pow(m35,2) * m44 
+      + 2 * m13 * m22 * m34 * m14 * m44 + 2 * m13 * m22 * m35 * m15 * m44
+      + pow(m13,2) * pow(m34,2) * m44 - 2 * m11 * m22 * pow(m34,2) * m44
+      - 2 * m13 * pow(m34,3) * m14 - 2 * m11 * m22 * pow(m35,2) * m44
+      + 2 * m11 * pow(m35,2) * pow(m34,2) + m22 * pow(m14,2) * pow(m35,2)
+      - 2 * m13 * pow(m35,2) * m34 * m14 - 2 * m13 * pow(m34, 2) * m35 * m15
+      + m11 * pow(m34,4) + m22 * pow(m15,2) * pow(m34,2)+ m22 * pow(m35,2) * pow(m15,2) 
+      + m11 * pow(m35,4) + m11 * pow(m22,2) * pow(m44,2) + m22 * pow(m34,2) * pow(m14,2)  
+      - pow(m22,2) * pow(m15,2) * m44 - pow(m22,2) * pow(m14,2) * m44 ;
 
     /* 	Calcolo radice del polinomio 	*/
   if ((pow(b,2) - 4 * a * c) >= 0)

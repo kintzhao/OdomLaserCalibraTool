@@ -1,0 +1,10 @@
+<launch>
+
+  <node pkg="LaserOdomCalibration" name="calib" type="io_test" output="screen">
+    <param name="file_path" type="string" value="/home/yhzhao/dataset/calib/" />
+    <param name="bagname" type="string" value="calib1_2020-04-24-02-31-03" />
+    <param name="laser_topic" type="string" value="/scan" />
+    <param name="odom_topic" type="string" value="/odometry/velocity" />
+  </node>
+
+</launch>

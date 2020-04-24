@@ -1,5 +1,9 @@
 ﻿#include <io.h>
 #include <utils.h>
+#include <LaserOdomCalibration/velocity.h>
+
+const double kEncodeVelToLineleVel = 2*M_PI*0.0845/600;
+const double kEncodeVelToAngleVel = 2*M_PI/600.0;  //because of encode data is 10*rpm   rpm: circle_nums in one minute
 
 messageIO::messageIO()
 {
@@ -69,14 +73,25 @@ void messageIO::readDataFromBag(const std::string &bag_name, const std::string &
 //      odom_data.push_back(tmp);
 //    }
 //
-    geometry_msgs::Vector3StampedConstPtr odom = m.instantiate<geometry_msgs::Vector3Stamped>();
+    LaserOdomCalibration::velocityConstPtr odom = m.instantiate<LaserOdomCalibration::velocity>();
     if (odom != NULL) {
       odometerData tmp;
-      tmp.timestamp = odom->header.stamp;
-      tmp.v_l = odom->vector.x;
-      tmp.v_r = odom->vector.y;
+      //std::cout<<"odom:"<< odom->stamp<<std::endl;
+      tmp.timestamp = odom->stamp;
+      tmp.v_l = odom->left_vel*kEncodeVelToAngleVel;// rad/s
+      tmp.v_r = -odom->right_vel*kEncodeVelToAngleVel;
+      //std::cout<<"L: "<<tmp.v_l <<" r: "<< tmp.v_r<<std::endl;
       odom_data.push_back(tmp);
     }
+ 
+    // geometry_msgs::Vector3StampedConstPtr odom = m.instantiate<geometry_msgs::Vector3Stamped>();
+    // if (odom != NULL) {
+    //   odometerData tmp;
+    //   tmp.timestamp = odom->header.stamp;
+    //   tmp.v_l = odom->vector.x;
+    //   tmp.v_r = odom->vector.y;
+    //   odom_data.push_back(tmp);
+    // }
   }
 
   // std::cout << "laser size: " << laser_data.size() << '\n' << "odom size: " << odom_data.size() << std::endl;

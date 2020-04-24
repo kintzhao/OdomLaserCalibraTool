@@ -28,10 +28,10 @@ int main(int argc, char **argv)
   ros::param::get("~odom_topic", odom_topic);
 
   std::string bagfile = file_path + bagname + ".bag";
-  std::string resultfile = file_path + bagname + "plicp_results.txt";
-  std::string syncfile = file_path + bagname + "sync_results.txt";
-  std::string smfile = file_path + bagname + "scan_match_results.txt";
-  std::string odomfile = file_path + bagname + "odom.txt";
+  std::string resultfile = file_path +"log/" + bagname+ "plicp_results.txt";
+  std::string syncfile = file_path +"log/" + bagname+ "sync_results.txt";
+  std::string smfile = file_path+"log/" + bagname + "scan_match_results.txt";
+  std::string odomfile = file_path +"log/" + bagname+ "odom.txt";
 //  std::string laser_topic = "/scan";
 //  std::string odom_topic = "/odom";
   std::vector<messageIO::laserScanData> laser_data(0);
@@ -117,7 +117,8 @@ int main(int argc, char **argv)
   std::cout << colouredString("Sync results saved!", GREEN, REGULAR) << std::endl;
 
   cSolve.calib(sync_results, 4);
+  std::cout << "\n==================> Finish <==================\n\n"  << std::endl;
 
-  ros::spin();
+  //ros::spin();
   return 0;
 }
